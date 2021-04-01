@@ -20,7 +20,7 @@
         "ext-json": "*",
         "guzzlehttp/guzzle": "^6.0",
         "ocramius/package-versions": "^1.2",
-        "tarampampam/wrappers-php": "^1.2"
+        "ext-mbstring": "*"
     },
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",
