@@ -103,7 +103,7 @@ class Client implements ClientInterface, WithSettingsInterface, WithEventsHandle
      */
     public function getVersion(bool $without_hash = true): string
     {
-        $version = Versions::getVersion('avtocod/b2b-api-php');
+        $version = Versions::getVersion('manzor29/avtocod-b2b-api-php');
 
         if ($without_hash === true && \is_int($delimiter_position = \mb_strpos($version, '@'))) {
             return \mb_substr($version, 0, (int) $delimiter_position);
