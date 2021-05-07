@@ -22,6 +22,7 @@
         "ocramius/package-versions": "^1.2",
         "ext-mbstring": "*"
     },
+    "minimum-stability": "stable",
     "require-dev": {
         "fzaninotto/faker": "^1.9.1",
         "mockery/mockery": "^1.3",
