@@ -4,18 +4,17 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses;
 
+use DateTime;
 use Countable;
 use ArrayIterator;
-use DateTimeImmutable;
 use IteratorAggregate;
+use Tarampampam\Wrappers\Json;
 use Avtocod\B2BApi\DateTimeFactory;
 use Avtocod\B2BApi\Responses\Entities\Report;
 use Avtocod\B2BApi\Exceptions\BadResponseException;
+use Tarampampam\Wrappers\Exceptions\JsonEncodeDecodeException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
-/**
- * @implements IteratorAggregate<int, Report>
- */
 class UserReportResponse implements ResponseInterface, Countable, IteratorAggregate
 {
     /**
@@ -34,25 +33,25 @@ class UserReportResponse implements ResponseInterface, Countable, IteratorAggreg
     protected $size;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $stamp;
 
     /**
-     * @var array<int, Report>
+     * @var Report[]
      */
     protected $data;
 
     /**
      * Create a new response instance.
      *
-     * @param string             $raw_response
-     * @param string             $state
-     * @param int                $size
-     * @param DateTimeImmutable  $stamp
-     * @param array<int, Report> $data
+     * @param string   $raw_response
+     * @param string   $state
+     * @param int      $size
+     * @param DateTime $stamp
+     * @param Report[] $data
      */
-    private function __construct(string $raw_response, string $state, int $size, DateTimeImmutable $stamp, array $data)
+    private function __construct(string $raw_response, string $state, int $size, DateTime $stamp, array $data)
     {
         $this->raw_response_content = $raw_response;
         $this->state                = $state;
@@ -76,21 +75,21 @@ class UserReportResponse implements ResponseInterface, Countable, IteratorAggreg
      */
     public static function fromHttpResponse(HttpResponseInterface $response): self
     {
-        $as_array = (array) \json_decode($raw_response = (string) $response->getBody(), true);
-
-        if (\json_last_error() !== \JSON_ERROR_NONE) {
-            throw BadResponseException::wrongJson($response, \json_last_error_msg());
+        try {
+            $as_array = (array) Json::decode($raw_response = (string) $response->getBody());
+        } catch (JsonEncodeDecodeException $e) {
+            throw BadResponseException::wrongJson($response, $e->getMessage(), $e);
         }
 
         $as_array['data'] = \array_map(static function (array $data): Report {
             return Report::fromArray($data);
         }, $as_array['data']);
 
-        return new self(
+        return new static(
             $raw_response,
             $as_array['state'],
             $as_array['size'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($as_array['stamp'])),
+            DateTimeFactory::createFromIso8601Zulu($as_array['stamp']),
             $as_array['data']
         );
     }
@@ -118,9 +117,9 @@ class UserReportResponse implements ResponseInterface, Countable, IteratorAggreg
     /**
      * Get response date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getStamp(): DateTimeImmutable
+    public function getStamp(): DateTime
     {
         return $this->stamp;
     }
@@ -128,7 +127,7 @@ class UserReportResponse implements ResponseInterface, Countable, IteratorAggreg
     /**
      * Get reports data.
      *
-     * @return array<int, Report>
+     * @return Report[]
      */
     public function getData(): array
     {
@@ -154,7 +153,7 @@ class UserReportResponse implements ResponseInterface, Countable, IteratorAggreg
     }
 
     /**
-     * @return ArrayIterator<int, Report>
+     * {@inheritdoc}
      */
     public function getIterator(): ArrayIterator
     {

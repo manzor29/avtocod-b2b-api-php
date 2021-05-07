@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses\Entities;
 
-use DateTimeImmutable;
+use DateTime;
 use Avtocod\B2BApi\DateTimeFactory;
 
 class User implements CanCreateSelfFromArrayInterface
@@ -70,17 +70,17 @@ class User implements CanCreateSelfFromArrayInterface
     protected $domain;
 
     /**
-     * @var array<string>
+     * @var string[]
      */
     protected $roles;
 
     /**
-     * @var array<string>
+     * @var string[]
      */
     protected $tags;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $created_at;
 
@@ -90,7 +90,7 @@ class User implements CanCreateSelfFromArrayInterface
     protected $created_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $updated_at;
 
@@ -100,12 +100,12 @@ class User implements CanCreateSelfFromArrayInterface
     protected $updated_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_from;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_to;
 
@@ -127,26 +127,26 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Create a new user instance.
      *
-     * @param string            $uid         Unique user ID
-     * @param string            $comment     User comment
-     * @param string            $contacts    User contact info
-     * @param string            $email       User email
-     * @param string            $login       Login (e.g. `user@domain`)
-     * @param string            $name        Human-readable user name
-     * @param string            $state       User status (e.g.: `ACTIVATION_REQUIRED`, `ACTIVE`, `BANNED`)
-     * @param string            $domain_uid  User domain unique ID
-     * @param Domain|null       $domain      User domain object (optional)
-     * @param array<string>     $roles       User roles
-     * @param array<string>     $tags        Additional user tags
-     * @param DateTimeImmutable $created_at  User created at
-     * @param string            $created_by  User creator
-     * @param DateTimeImmutable $updated_at  Last changes was made at
-     * @param string            $updated_by  Last changes was made by
-     * @param DateTimeImmutable $active_from Active from
-     * @param DateTimeImmutable $active_to   Active to
-     * @param int|null          $id          Internal database identifier (optional, only for administrators)
-     * @param bool|null         $deleted     Is deleted flag (optional, only for administrators)
-     * @param string|null       $pass_hash   Password hash (optional, only for administrators)
+     * @param string      $uid         Unique user ID
+     * @param string      $comment     User comment
+     * @param string      $contacts    User contact info
+     * @param string      $email       User email
+     * @param string      $login       Login (e.g. `user@domain`)
+     * @param string      $name        Human-readable user name
+     * @param string      $state       User status (e.g.: `ACTIVATION_REQUIRED`, `ACTIVE`, `BANNED`)
+     * @param string      $domain_uid  User domain unique ID
+     * @param Domain|null $domain      User domain object (optional)
+     * @param string[]    $roles       User roles
+     * @param string[]    $tags        Additional user tags
+     * @param DateTime    $created_at  User created at
+     * @param string      $created_by  User creator
+     * @param DateTime    $updated_at  Last changes was made at
+     * @param string      $updated_by  Last changes was made by
+     * @param DateTime    $active_from Active from
+     * @param DateTime    $active_to   Active to
+     * @param int|null    $id          Internal database identifier (optional, only for administrators)
+     * @param bool|null   $deleted     Is deleted flag (optional, only for administrators)
+     * @param string|null $pass_hash   Password hash (optional, only for administrators)
      */
     public function __construct(string $uid,
                                 string $comment,
@@ -159,12 +159,12 @@ class User implements CanCreateSelfFromArrayInterface
                                 ?Domain $domain,
                                 array $roles,
                                 array $tags,
-                                DateTimeImmutable $created_at,
+                                DateTime $created_at,
                                 string $created_by,
-                                DateTimeImmutable $updated_at,
+                                DateTime $updated_at,
                                 string $updated_by,
-                                DateTimeImmutable $active_from,
-                                DateTimeImmutable $active_to,
+                                DateTime $active_from,
+                                DateTime $active_to,
                                 ?int $id,
                                 ?bool $deleted,
                                 ?string $pass_hash)
@@ -192,11 +192,11 @@ class User implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['uid'],
             $data['comment'],
             $data['contacts'],
@@ -210,12 +210,12 @@ class User implements CanCreateSelfFromArrayInterface
                 : null,
             \array_filter(\explode(',', $data['roles'])),
             \array_filter(\explode(',', $data['tags'])),
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['created_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['created_at']),
             $data['created_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['updated_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['updated_at']),
             $data['updated_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_from'])),
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_to'])),
+            DateTimeFactory::createFromIso8601Zulu($data['active_from']),
+            DateTimeFactory::createFromIso8601Zulu($data['active_to']),
             $data['id'] ?? null,
             $data['deleted'] ?? null,
             $data['pass_hash'] ?? null
@@ -315,7 +315,7 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get user roles list.
      *
-     * @return array<string>
+     * @return string[]
      */
     public function getRoles(): array
     {
@@ -325,7 +325,7 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get additional user tags.
      *
-     * @return array<string>
+     * @return string[]
      */
     public function getTags(): array
     {
@@ -335,9 +335,9 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get created at date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->created_at;
     }
@@ -355,9 +355,9 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get last changes date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): DateTime
     {
         return $this->updated_at;
     }
@@ -375,9 +375,9 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get active from date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveFrom(): DateTimeImmutable
+    public function getActiveFrom(): DateTime
     {
         return $this->active_from;
     }
@@ -385,9 +385,9 @@ class User implements CanCreateSelfFromArrayInterface
     /**
      * Get active to date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveTo(): DateTimeImmutable
+    public function getActiveTo(): DateTime
     {
         return $this->active_to;
     }

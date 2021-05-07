@@ -14,15 +14,15 @@ final class BeforeRequestSendingEvent
     private $request;
 
     /**
-     * @var array<string, mixed>
+     * @var array
      */
     private $options;
 
     /**
      * Create a new event instance.
      *
-     * @param RequestInterface     $request
-     * @param array<string, mixed> $options
+     * @param RequestInterface $request
+     * @param array            $options
      */
     public function __construct(RequestInterface $request, array $options)
     {
@@ -39,7 +39,7 @@ final class BeforeRequestSendingEvent
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array
      */
     public function getOptions(): array
     {

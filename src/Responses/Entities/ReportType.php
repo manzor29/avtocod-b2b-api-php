@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses\Entities;
 
-use DateTimeImmutable;
+use DateTime;
 use Avtocod\B2BApi\DateTimeFactory;
 
 class ReportType implements CanCreateSelfFromArrayInterface
@@ -60,7 +60,7 @@ class ReportType implements CanCreateSelfFromArrayInterface
     protected $state;
 
     /**
-     * @var array<string>
+     * @var string[]
      */
     protected $tags;
 
@@ -115,7 +115,7 @@ class ReportType implements CanCreateSelfFromArrayInterface
     protected $max_request;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $created_at;
 
@@ -125,7 +125,7 @@ class ReportType implements CanCreateSelfFromArrayInterface
     protected $created_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $updated_at;
 
@@ -135,12 +135,12 @@ class ReportType implements CanCreateSelfFromArrayInterface
     protected $updated_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_from;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_to;
 
@@ -171,7 +171,7 @@ class ReportType implements CanCreateSelfFromArrayInterface
      * @param string                 $comment          Report type comment
      * @param string                 $name             Human-readable report type name
      * @param string                 $state            Report type state (e.g.: `DRAFT`, `PUBLISHED`, `OBSOLETE`)
-     * @param array<string>          $tags             Additional report type tags
+     * @param string[]               $tags             Additional report type tags
      * @param int                    $max_age          Period of relevance
      * @param string                 $domain_uid       Domain unique ID
      * @param ReportTypeContent|null $content          Report type content
@@ -183,12 +183,12 @@ class ReportType implements CanCreateSelfFromArrayInterface
      * @param int                    $period_priority  Time unit (in milliseconds) for priority calculation
      * @param int                    $max_request      Number of requests in a given time unit, which will lower the
      *                                                 priority to a minimum
-     * @param DateTimeImmutable      $created_at       Report type created at
+     * @param DateTime               $created_at       Report type created at
      * @param string                 $created_by       Report type creator
-     * @param DateTimeImmutable      $updated_at       Last changes was made at
+     * @param DateTime               $updated_at       Last changes was made at
      * @param string                 $updated_by       Last changes was made by
-     * @param DateTimeImmutable      $active_from      Active from
-     * @param DateTimeImmutable      $active_to        Active to
+     * @param DateTime               $active_from      Active from
+     * @param DateTime               $active_to        Active to
      * @param CleanOptions|null      $clean_options    Objects obsolescence
      * @param string|null            $report_make_mode Report generation mode (e.g.: `TRANSACTIONAL`,
      *                                                 `FAST_NON_TRANSACTIONAL`, `FAST_NON_BALANCE`)
@@ -210,12 +210,12 @@ class ReportType implements CanCreateSelfFromArrayInterface
                                 int $max_priority,
                                 int $period_priority,
                                 int $max_request,
-                                DateTimeImmutable $created_at,
+                                DateTime $created_at,
                                 string $created_by,
-                                DateTimeImmutable $updated_at,
+                                DateTime $updated_at,
                                 string $updated_by,
-                                DateTimeImmutable $active_from,
-                                DateTimeImmutable $active_to,
+                                DateTime $active_from,
+                                DateTime $active_to,
                                 ?CleanOptions $clean_options,
                                 ?string $report_make_mode,
                                 ?int $id,
@@ -249,11 +249,11 @@ class ReportType implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['uid'],
             $data['comment'],
             $data['name'],
@@ -271,12 +271,12 @@ class ReportType implements CanCreateSelfFromArrayInterface
             $data['max_priority'],
             $data['period_priority'],
             $data['max_request'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['created_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['created_at']),
             $data['created_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['updated_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['updated_at']),
             $data['updated_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_from'])),
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_to'])),
+            DateTimeFactory::createFromIso8601Zulu($data['active_from']),
+            DateTimeFactory::createFromIso8601Zulu($data['active_to']),
             isset($data['clean_options'])
                 ? CleanOptions::fromArray($data['clean_options'])
                 : null,
@@ -329,7 +329,7 @@ class ReportType implements CanCreateSelfFromArrayInterface
     /**
      * Get additional report type tags.
      *
-     * @return array<string>
+     * @return string[]
      */
     public function getTags()
     {
@@ -439,9 +439,9 @@ class ReportType implements CanCreateSelfFromArrayInterface
     /**
      * Get created at date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->created_at;
     }
@@ -459,9 +459,9 @@ class ReportType implements CanCreateSelfFromArrayInterface
     /**
      * Get last changes date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): DateTime
     {
         return $this->updated_at;
     }
@@ -479,9 +479,9 @@ class ReportType implements CanCreateSelfFromArrayInterface
     /**
      * Get active from date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveFrom(): DateTimeImmutable
+    public function getActiveFrom(): DateTime
     {
         return $this->active_from;
     }
@@ -489,9 +489,9 @@ class ReportType implements CanCreateSelfFromArrayInterface
     /**
      * Get active to date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveTo(): DateTimeImmutable
+    public function getActiveTo(): DateTime
     {
         return $this->active_to;
     }

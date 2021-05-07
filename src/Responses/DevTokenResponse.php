@@ -4,9 +4,11 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses;
 
-use DateTimeImmutable;
+use DateTime;
+use Tarampampam\Wrappers\Json;
 use Avtocod\B2BApi\DateTimeFactory;
 use Avtocod\B2BApi\Exceptions\BadResponseException;
+use Tarampampam\Wrappers\Exceptions\JsonEncodeDecodeException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
 class DevTokenResponse implements ResponseInterface
@@ -32,7 +34,7 @@ class DevTokenResponse implements ResponseInterface
     protected $password_hash;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $date;
 
@@ -74,24 +76,24 @@ class DevTokenResponse implements ResponseInterface
     /**
      * Create a new response instance.
      *
-     * @param string            $raw_response
-     * @param string            $user
-     * @param string            $password
-     * @param string            $password_hash
-     * @param DateTimeImmutable $date
-     * @param int               $stamp
-     * @param int               $age
-     * @param string            $salt
-     * @param string            $salted_pass_hash
-     * @param string            $raw_token
-     * @param string            $token
-     * @param string            $header
+     * @param string   $raw_response
+     * @param string   $user
+     * @param string   $password
+     * @param string   $password_hash
+     * @param DateTime $date
+     * @param int      $stamp
+     * @param int      $age
+     * @param string   $salt
+     * @param string   $salted_pass_hash
+     * @param string   $raw_token
+     * @param string   $token
+     * @param string   $header
      */
     private function __construct(string $raw_response,
                                  string $user,
                                  string $password,
                                  string $password_hash,
-                                 DateTimeImmutable $date,
+                                 DateTime $date,
                                  int $stamp,
                                  int $age,
                                  string $salt,
@@ -129,18 +131,18 @@ class DevTokenResponse implements ResponseInterface
      */
     public static function fromHttpResponse(HttpResponseInterface $response): self
     {
-        $as_array = (array) \json_decode($raw_response = (string) $response->getBody(), true);
-
-        if (\json_last_error() !== \JSON_ERROR_NONE) {
-            throw BadResponseException::wrongJson($response, \json_last_error_msg());
+        try {
+            $as_array = (array) Json::decode($raw_response = (string) $response->getBody());
+        } catch (JsonEncodeDecodeException $e) {
+            throw BadResponseException::wrongJson($response, $e->getMessage(), $e);
         }
 
-        return new self(
+        return new static(
             $raw_response,
             $as_array['user'],
             $as_array['pass'],
             $as_array['pass_hash'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($as_array['date'])),
+            DateTimeFactory::createFromIso8601Zulu($as_array['date']),
             $as_array['stamp'],
             $as_array['age'],
             $as_array['salt'],
@@ -176,9 +178,9 @@ class DevTokenResponse implements ResponseInterface
     }
 
     /**
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getDate(): DateTimeImmutable
+    public function getDate(): DateTime
     {
         return $this->date;
     }

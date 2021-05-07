@@ -17,16 +17,16 @@ class ReportQuery implements CanCreateSelfFromArrayInterface
     protected $body;
 
     /**
-     * @var array<mixed, mixed>|null
+     * @var array|null
      */
     protected $data;
 
     /**
      * Create a new report query instance.
      *
-     * @param string|null              $type
-     * @param string|null              $body
-     * @param array<mixed, mixed>|null $data
+     * @param string|null $type
+     * @param string|null $body
+     * @param array|null  $data
      */
     public function __construct(?string $type, ?string $body, ?array $data)
     {
@@ -36,11 +36,11 @@ class ReportQuery implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['type'] ?? null,
             $data['body'] ?? null,
             $data['data'] ?? null
@@ -70,7 +70,7 @@ class ReportQuery implements CanCreateSelfFromArrayInterface
     /**
      * Get query data.
      *
-     * @return array<mixed, mixed>|null
+     * @return array|null
      */
     public function getData(): ?array
     {

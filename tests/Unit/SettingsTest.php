@@ -2,10 +2,9 @@
 
 declare(strict_types = 1);
 
-namespace Avtocod\B2BApi\Tests\Unit;
+namespace Avtocod\B2BApi\Tests;
 
 use Avtocod\B2BApi\Settings;
-use Avtocod\B2BApi\Tests\AbstractTestCase;
 use GuzzleHttp\RequestOptions as GuzzleHttpOptions;
 
 /**

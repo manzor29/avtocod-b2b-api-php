@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses\Entities;
 
-use DateTimeImmutable;
+use DateTime;
 use Avtocod\B2BApi\DateTimeFactory;
 
 class ReportMade implements CanCreateSelfFromArrayInterface
@@ -25,19 +25,19 @@ class ReportMade implements CanCreateSelfFromArrayInterface
     protected $process_request_uid;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $suggest_get;
 
     /**
      * Create a new report made instance.
      *
-     * @param string            $report_uid          Report unique ID
-     * @param bool              $is_new              Report is new?
-     * @param string|null       $process_request_uid Unique report request ID
-     * @param DateTimeImmutable $suggest_get         Suggested date/time for report getting
+     * @param string      $report_uid          Report unique ID
+     * @param bool        $is_new              Report is new?
+     * @param string|null $process_request_uid Unique report request ID
+     * @param DateTime    $suggest_get         Suggested date/time for report getting
      */
-    public function __construct(string $report_uid, bool $is_new, ?string $process_request_uid, DateTimeImmutable $suggest_get)
+    public function __construct(string $report_uid, bool $is_new, ?string $process_request_uid, DateTime $suggest_get)
     {
         $this->report_uid          = $report_uid;
         $this->is_new              = $is_new;
@@ -46,15 +46,15 @@ class ReportMade implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['uid'],
             $data['isnew'],
             $data['process_request_uid'] ?? null,
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu((string) $data['suggest_get']))
+            DateTimeFactory::createFromIso8601Zulu($data['suggest_get'])
         );
     }
 
@@ -91,9 +91,9 @@ class ReportMade implements CanCreateSelfFromArrayInterface
     /**
      * Get suggested date/time for report getting.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getSuggestGet(): DateTimeImmutable
+    public function getSuggestGet(): DateTime
     {
         return $this->suggest_get;
     }

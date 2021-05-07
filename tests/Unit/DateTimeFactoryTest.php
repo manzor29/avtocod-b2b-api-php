@@ -2,12 +2,11 @@
 
 declare(strict_types = 1);
 
-namespace Avtocod\B2BApi\Tests\Unit;
+namespace Avtocod\B2BApi\Tests;
 
 use DateTime;
 use InvalidArgumentException;
 use Avtocod\B2BApi\DateTimeFactory;
-use Avtocod\B2BApi\Tests\AbstractTestCase;
 
 /**
  * @group  datetime
@@ -124,7 +123,7 @@ class DateTimeFactoryTest extends AbstractTestCase
     public function testCreateFromIso8601ZuluThrowsAnException(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('~Wrong time.*passed~');
+        $this->expectExceptionMessageRegExp('~Wrong time.*passed~');
 
         DateTimeFactory::createFromIso8601Zulu('foo bar');
     }

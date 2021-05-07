@@ -7,20 +7,20 @@ namespace Avtocod\B2BApi\Responses\Entities;
 class ReportTypeContent implements CanCreateSelfFromArrayInterface
 {
     /**
-     * @var array<string>
+     * @var array|string[]
      */
     protected $sources;
 
     /**
-     * @var array<string>
+     * @var array|string[]
      */
     protected $fields;
 
     /**
      * Create a new report type content instance.
      *
-     * @param array<string> $sources Sources list
-     * @param array<string> $fields  Fields list
+     * @param string[] $sources Sources list
+     * @param string[] $fields  Fields list
      */
     public function __construct(array $sources, array $fields)
     {
@@ -29,11 +29,11 @@ class ReportTypeContent implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['sources'],
             $data['fields']
         );
@@ -42,7 +42,7 @@ class ReportTypeContent implements CanCreateSelfFromArrayInterface
     /**
      * Get sources list.
      *
-     * @return array<string>
+     * @return array|string[]
      */
     public function getSources(): array
     {
@@ -52,7 +52,7 @@ class ReportTypeContent implements CanCreateSelfFromArrayInterface
     /**
      * Get fields list.
      *
-     * @return array<string>
+     * @return array|string[]
      */
     public function getFields(): array
     {

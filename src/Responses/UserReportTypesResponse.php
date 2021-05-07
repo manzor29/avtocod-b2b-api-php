@@ -4,18 +4,17 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses;
 
+use DateTime;
 use Countable;
 use ArrayIterator;
-use DateTimeImmutable;
 use IteratorAggregate;
+use Tarampampam\Wrappers\Json;
 use Avtocod\B2BApi\DateTimeFactory;
 use Avtocod\B2BApi\Responses\Entities\ReportType;
 use Avtocod\B2BApi\Exceptions\BadResponseException;
+use Tarampampam\Wrappers\Exceptions\JsonEncodeDecodeException;
 use Psr\Http\Message\ResponseInterface as HttpResponseInterface;
 
-/**
- * @implements IteratorAggregate<int, ReportType>
- */
 class UserReportTypesResponse implements ResponseInterface, Countable, IteratorAggregate
 {
     /**
@@ -34,12 +33,12 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
     protected $size;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $stamp;
 
     /**
-     * @var array<int, ReportType>
+     * @var array|ReportType[]
      */
     protected $data;
 
@@ -51,17 +50,17 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
     /**
      * Create a new response instance.
      *
-     * @param string                 $raw_response
-     * @param string                 $state
-     * @param int                    $size
-     * @param DateTimeImmutable      $stamp
-     * @param array<int, ReportType> $data
-     * @param int|null               $total
+     * @param string       $raw_response
+     * @param string       $state
+     * @param int          $size
+     * @param DateTime     $stamp
+     * @param ReportType[] $data
+     * @param int          $total
      */
     private function __construct(string $raw_response,
                                  string $state,
                                  int $size,
-                                 DateTimeImmutable $stamp,
+                                 DateTime $stamp,
                                  array $data,
                                  ?int $total)
     {
@@ -88,21 +87,21 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
      */
     public static function fromHttpResponse(HttpResponseInterface $response): self
     {
-        $as_array = (array) \json_decode($raw_response = (string) $response->getBody(), true);
-
-        if (\json_last_error() !== \JSON_ERROR_NONE) {
-            throw BadResponseException::wrongJson($response, \json_last_error_msg());
+        try {
+            $as_array = (array) Json::decode($raw_response = (string) $response->getBody());
+        } catch (JsonEncodeDecodeException $e) {
+            throw BadResponseException::wrongJson($response, $e->getMessage(), $e);
         }
 
         $as_array['data'] = \array_map(static function (array $report_type_data): ReportType {
             return ReportType::fromArray($report_type_data);
         }, $as_array['data']);
 
-        return new self(
+        return new static(
             $raw_response,
             $as_array['state'],
             $as_array['size'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($as_array['stamp'])),
+            DateTimeFactory::createFromIso8601Zulu($as_array['stamp']),
             $as_array['data'],
             $as_array['total'] ?? null
         );
@@ -131,9 +130,9 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
     /**
      * Get response date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getStamp(): DateTimeImmutable
+    public function getStamp(): DateTime
     {
         return $this->stamp;
     }
@@ -141,7 +140,7 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
     /**
      * Get report types data.
      *
-     * @return array<int, ReportType>
+     * @return ReportType[]
      */
     public function getData(): array
     {
@@ -185,7 +184,7 @@ class UserReportTypesResponse implements ResponseInterface, Countable, IteratorA
     }
 
     /**
-     * @return ArrayIterator<int, ReportType>
+     * {@inheritdoc}
      */
     public function getIterator(): ArrayIterator
     {

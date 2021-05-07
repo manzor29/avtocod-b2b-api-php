@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses\Entities;
 
-use DateTimeImmutable;
+use DateTime;
 
 class Group
 {
@@ -24,22 +24,22 @@ class Group
     protected $name;
 
     /**
-     * @var array<int, User>|null
+     * @var User[]|null
      */
     protected $users;
 
     /**
-     * @var array<string>|null
+     * @var string[]|null
      */
     protected $roles;
 
     /**
-     * @var array<string>
+     * @var string[]
      */
     protected $tags;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $created_at;
 
@@ -49,7 +49,7 @@ class Group
     protected $created_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $updated_at;
 
@@ -59,12 +59,12 @@ class Group
     protected $updated_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_from;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_to;
 
@@ -81,20 +81,20 @@ class Group
     /**
      * Create a new group instance.
      *
-     * @param string                $uid         Unique group ID
-     * @param string                $comment     Group comment
-     * @param string                $name        Human-readable group name
-     * @param array<int, User>|null $users       Group users list (optional)
-     * @param array<string>|null    $roles       Group roles list (optional)
-     * @param array<string>         $tags        Additional group tags
-     * @param DateTimeImmutable     $created_at  Group created at
-     * @param string                $created_by  Group creator
-     * @param DateTimeImmutable     $updated_at  Last changes was made at
-     * @param string                $updated_by  Last changes was made by
-     * @param DateTimeImmutable     $active_from Active from
-     * @param DateTimeImmutable     $active_to   Active to
-     * @param int|null              $id          Internal database identifier (optional, only for administrators)
-     * @param bool|null             $deleted     Is deleted flag (optional, only for administrators)
+     * @param string        $uid         Unique group ID
+     * @param string        $comment     Group comment
+     * @param string        $name        Human-readable group name
+     * @param User[]|null   $users       Group users list (optional)
+     * @param string[]|null $roles       Group roles list (optional)
+     * @param string[]      $tags        Additional group tags
+     * @param DateTime      $created_at  Group created at
+     * @param string        $created_by  Group creator
+     * @param DateTime      $updated_at  Last changes was made at
+     * @param string        $updated_by  Last changes was made by
+     * @param DateTime      $active_from Active from
+     * @param DateTime      $active_to   Active to
+     * @param int|null      $id          Internal database identifier (optional, only for administrators)
+     * @param bool|null     $deleted     Is deleted flag (optional, only for administrators)
      */
     public function __construct(string $uid,
                                 string $comment,
@@ -102,12 +102,12 @@ class Group
                                 ?array $users,
                                 ?array $roles,
                                 array $tags,
-                                DateTimeImmutable $created_at,
+                                DateTime $created_at,
                                 string $created_by,
-                                DateTimeImmutable $updated_at,
+                                DateTime $updated_at,
                                 string $updated_by,
-                                DateTimeImmutable $active_from,
-                                DateTimeImmutable $active_to,
+                                DateTime $active_from,
+                                DateTime $active_to,
                                 ?int $id,
                                 ?bool $deleted)
     {
@@ -160,7 +160,7 @@ class Group
     /**
      * Get group users list.
      *
-     * @return array<int, User>|null
+     * @return User[]|null
      */
     public function getUsers(): ?array
     {
@@ -170,7 +170,7 @@ class Group
     /**
      * Get group roles list.
      *
-     * @return array<string>|null
+     * @return string[]|null
      */
     public function getRoles(): ?array
     {
@@ -180,7 +180,7 @@ class Group
     /**
      * Get additional group tags.
      *
-     * @return array<string>
+     * @return string[]
      */
     public function getTags(): array
     {
@@ -190,9 +190,9 @@ class Group
     /**
      * Get created at date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->created_at;
     }
@@ -210,9 +210,9 @@ class Group
     /**
      * Get last changes date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): DateTime
     {
         return $this->updated_at;
     }
@@ -230,9 +230,9 @@ class Group
     /**
      * Get active from date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveFrom(): DateTimeImmutable
+    public function getActiveFrom(): DateTime
     {
         return $this->active_from;
     }
@@ -240,9 +240,9 @@ class Group
     /**
      * Get active to date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveTo(): DateTimeImmutable
+    public function getActiveTo(): DateTime
     {
         return $this->active_to;
     }

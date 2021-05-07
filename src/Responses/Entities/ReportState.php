@@ -7,7 +7,7 @@ namespace Avtocod\B2BApi\Responses\Entities;
 class ReportState implements CanCreateSelfFromArrayInterface
 {
     /**
-     * @var array<int, ReportSourceState>
+     * @var array|ReportSourceState[]
      */
     protected $source_states;
 
@@ -22,11 +22,11 @@ class ReportState implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             \array_map(static function (array $report_data): ReportSourceState {
                 return ReportSourceState::fromArray($report_data);
             }, $data['sources'])
@@ -36,7 +36,7 @@ class ReportState implements CanCreateSelfFromArrayInterface
     /**
      * Get report sources stated.
      *
-     * @return array<int, ReportSourceState>
+     * @return array|ReportSourceState[]
      */
     public function getSourceStates(): array
     {

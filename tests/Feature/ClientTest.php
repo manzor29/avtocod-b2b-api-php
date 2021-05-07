@@ -4,18 +4,13 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Tests\Feature;
 
+use DateTime;
 use Dotenv\Dotenv;
 use Avtocod\B2BApi\Client;
 use Avtocod\B2BApi\Settings;
-use Avtocod\B2BApi\Params\DevPingParams;
-use Avtocod\B2BApi\Params\DevTokenParams;
 use Avtocod\B2BApi\Tokens\Auth\AuthToken;
 use Avtocod\B2BApi\Tests\AbstractTestCase;
-use Avtocod\B2BApi\Params\UserReportParams;
-use Avtocod\B2BApi\Params\UserBalanceParams;
 use Avtocod\B2BApi\Responses\Entities\Balance;
-use Avtocod\B2BApi\Params\UserReportMakeParams;
-use Avtocod\B2BApi\Params\UserReportRefreshParams;
 
 /**
  * @coversNothing
@@ -54,7 +49,7 @@ class ClientTest extends AbstractTestCase
     {
         parent::setUp();
 
-        Dotenv::createUnsafeImmutable(__DIR__ . '/../')->load();
+        Dotenv::create(__DIR__ . '/../')->load();
 
         $this->username    = \getenv('B2B_USER');
         $this->password    = \getenv('B2B_PASSWORD');
@@ -69,10 +64,7 @@ class ClientTest extends AbstractTestCase
      */
     public function testDevPing(): void
     {
-        $this->assertSame(
-            $value = 'feature test' . \random_int(1, 9999),
-            $this->client->devPing((new DevPingParams)->setValue($value))->getValue()
-        );
+        $this->assertSame($value = 'feature test' . \random_int(1, 9999), $this->client->devPing($value)->getValue());
     }
 
     /**
@@ -80,14 +72,11 @@ class ClientTest extends AbstractTestCase
      */
     public function testDevToken(): void
     {
-        // Prepare params to request without domain
-        $params = new DevTokenParams($this->username, $this->password);
-        $params
-            ->setPasswordHashed(false)
-            ->setDateFrom($now = new \DateTime)
-            ->setTokenLifetime($age = 60);
+        $now = new DateTime;
+        $age = 60;
 
-        $response = $this->client->devToken($params);
+        // Without domain
+        $response = $this->client->devToken($this->username, $this->password, false, $now, $age);
 
         $this->assertSame($this->username, $response->getUser());
         $this->assertSame(
@@ -95,14 +84,8 @@ class ClientTest extends AbstractTestCase
             $response->getToken()
         );
 
-        // Prepare params to request with domain
-        $params = new DevTokenParams($this->username . '@' . $this->domain, $this->password);
-        $params
-            ->setPasswordHashed(false)
-            ->setDateFrom($now)
-            ->setTokenLifetime($age);
-
-        $response = $this->client->devToken($params);
+        // With domain
+        $response = $this->client->devToken($this->username . '@' . $this->domain, $this->password, false, $now, $age);
 
         $this->assertSame($this->username . '@' . $this->domain, $response->getUser());
         $this->assertSame(
@@ -129,10 +112,7 @@ class ClientTest extends AbstractTestCase
     {
         $this->assertSame(
             $this->report_type,
-            $this->client
-                ->userBalance(new UserBalanceParams($this->report_type))
-                ->getByType(Balance::TOTALLY)
-                ->getReportTypeUid()
+            $this->client->userBalance($this->report_type)->getByType(Balance::TOTALLY)->getReportTypeUid()
         );
     }
 
@@ -166,10 +146,9 @@ class ClientTest extends AbstractTestCase
      */
     public function testUserReport(): void
     {
-        $reports    = $this->client->userReports();
-        $report_uid = $reports->first()->getUid();
+        $reports = $this->client->userReports();
 
-        $report = $this->client->userReport(new UserReportParams($report_uid));
+        $report = $this->client->userReport($reports->first()->getUid());
 
         $this->assertSame(1, $report->getSize());
 
@@ -184,10 +163,7 @@ class ClientTest extends AbstractTestCase
     {
         $this->assertStringContainsString(
             $vin = 'Z94CB41AAGR323020',
-            $this->client
-                ->userReportMake((new UserReportMakeParams($this->report_type, 'VIN', $vin))->setForce(true))
-                ->first()
-                ->getReportUid()
+            $this->client->userReportMake($this->report_type, 'VIN', $vin, null, true)->first()->getReportUid()
         );
     }
 
@@ -200,7 +176,7 @@ class ClientTest extends AbstractTestCase
     {
         $reports    = $this->client->userReports();
         $report_uid = $reports->first()->getUid();
-        $response   = $this->client->userReportRefresh(new UserReportRefreshParams($report_uid));
+        $response   = $this->client->userReportRefresh($report_uid);
 
         $this->assertSame(
             $report_uid, $response->first()->getReportUid()

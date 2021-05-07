@@ -2,7 +2,7 @@
 
 declare(strict_types = 1);
 
-namespace Avtocod\B2BApi\Tests\Unit;
+namespace Avtocod\B2BApi\Tests;
 
 use DateTime;
 use Avtocod\B2BApi\Client;
@@ -11,28 +11,19 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Response;
 use PackageVersions\Versions;
+use Tarampampam\Wrappers\Json;
 use GuzzleHttp\Client as Guzzle;
 use Avtocod\B2BApi\ClientInterface;
 use Avtocod\B2BApi\DateTimeFactory;
-use Avtocod\B2BApi\Params\UserParams;
-use Avtocod\B2BApi\Params\DevPingParams;
-use Avtocod\B2BApi\Params\DevTokenParams;
 use Avtocod\B2BApi\WithSettingsInterface;
-use Avtocod\B2BApi\Tests\AbstractTestCase;
 use GuzzleHttp\Exception\ConnectException;
-use Avtocod\B2BApi\Params\UserReportParams;
 use Avtocod\B2BApi\Responses\Entities\User;
-use Avtocod\B2BApi\Params\UserBalanceParams;
-use Avtocod\B2BApi\Params\UserReportsParams;
 use Avtocod\B2BApi\Events\RequestFailedEvent;
 use Avtocod\B2BApi\Responses\Entities\Report;
 use Avtocod\B2BApi\Responses\Entities\Balance;
-use Avtocod\B2BApi\Params\UserReportMakeParams;
-use Avtocod\B2BApi\Params\UserReportTypesParams;
 use Avtocod\B2BApi\Responses\Entities\ReportMade;
 use Avtocod\B2BApi\Responses\Entities\ReportType;
 use Avtocod\B2BApi\Exceptions\BadRequestException;
-use Avtocod\B2BApi\Params\UserReportRefreshParams;
 use Avtocod\B2BApi\Events\AfterRequestSendingEvent;
 use Avtocod\B2BApi\Exceptions\BadResponseException;
 use Avtocod\B2BApi\Events\BeforeRequestSendingEvent;
@@ -99,7 +90,7 @@ class ClientTest extends AbstractTestCase
     public function testDoRequestWithServerSideError(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessageMatches('~GenericSystemError~');
+        $this->expectExceptionMessageRegExp('~GenericSystemError~');
 
         $this->guzzle_handler->onUriRegexpRequested(
             '~' . \preg_quote($this->settings->getBaseUri(), '/') . '.*~i',
@@ -121,7 +112,7 @@ class ClientTest extends AbstractTestCase
     public function testDoRequestWithSecurityError(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessageMatches('~SecurityAuthTimeoutedStamp~');
+        $this->expectExceptionMessageRegExp('~SecurityAuthTimeoutedStamp~');
 
         $this->guzzle_handler->onUriRegexpRequested(
             '~' . \preg_quote($this->settings->getBaseUri(), '/') . '.*~i',
@@ -156,7 +147,7 @@ class ClientTest extends AbstractTestCase
         $report_type_uid = 'foo@bar';
 
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessageMatches("~DataSeekObjectError\:.*Отсутствие объекта.*{$report_type_uid}~i");
+        $this->expectExceptionMessageRegExp("~DataSeekObjectError\:.*Отсутствие объекта.*{$report_type_uid}~i");
 
         $this->guzzle_handler->onUriRegexpRequested(
             '~' . \preg_quote($this->settings->getBaseUri(), '/') . '.*~i',
@@ -191,7 +182,7 @@ class ClientTest extends AbstractTestCase
     public function testDoRequestWithWrongJson(): void
     {
         $this->expectException(BadResponseException::class);
-        $this->expectExceptionMessageMatches('~syntax~i');
+        $this->expectExceptionMessageRegExp('~syntax~i');
 
         $this->guzzle_handler->onUriRegexpRequested(
             '~' . \preg_quote($this->settings->getBaseUri(), '/') . '.*~i',
@@ -211,7 +202,7 @@ class ClientTest extends AbstractTestCase
     public function testDoRequestWithServerError(): void
     {
         $this->expectException(BadRequestException::class);
-        $this->expectExceptionMessageMatches('~Failed to connect~i');
+        $this->expectExceptionMessageRegExp('~Failed to connect~i');
 
         $this->guzzle_handler->onUriRegexpRequested(
             '~' . \preg_quote($this->settings->getBaseUri(), '/') . '.*~i',
@@ -330,7 +321,7 @@ class ClientTest extends AbstractTestCase
             } elseif ($event instanceof BeforeRequestSendingEvent) {
                 $before_send_event = true;
             } elseif ($event instanceof AfterRequestSendingEvent && $event->getResponse() === $response) {
-                $this->assertEqualsWithDelta(0, $event->getDuration(), 5);
+                $this->assertEquals(0, $event->getDuration(), '', 5);
 
                 $sent_event = true;
             }
@@ -369,7 +360,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->devPing((new DevPingParams)->setValue($value));
+        $response = $this->client->devPing($value);
 
         $this->assertSame($value, $response->getValue());
         $this->assertSame($in, $response->getIn());
@@ -432,13 +423,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $params = new DevTokenParams($user, $pass);
-        $params
-            ->setPasswordHashed($is_hash)
-            ->setDateFrom($date)
-            ->setTokenLifetime($age);
-
-        $response = $this->client->devToken($params);
+        $response = $this->client->devToken($user, $pass, $is_hash, $date, $age);
 
         $this->assertSame($user, $response->getUser());
         $this->assertSame($pass, $response->getPassword());
@@ -478,13 +463,7 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $params = new DevTokenParams($user, $pass);
-        $params
-            ->setPasswordHashed($is_hash)
-            ->setDateFrom($date)
-            ->setTokenLifetime($age);
-
-        $this->client->devToken($params);
+        $this->client->devToken($user, $pass, $is_hash, $date, $age);
     }
 
     /**
@@ -624,7 +603,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->user((new UserParams)->setDetailed(true));
+        $response = $this->client->user(true);
 
         $this->assertSame($state, $response->getState());
         $this->assertSame($size, $response->getSize());
@@ -686,7 +665,7 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $this->client->user((new UserParams)->setDetailed(true));
+        $this->client->user(true);
     }
 
     /**
@@ -735,7 +714,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->userBalance(new UserBalanceParams($report_type_uid));
+        $response = $this->client->userBalance($report_type_uid);
 
         $this->assertSame($state, $response->getState());
         $this->assertSame($size, $response->getSize());
@@ -828,7 +807,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->userBalance((new UserBalanceParams($report_type_uid))->setDetailed(true));
+        $response = $this->client->userBalance($report_type_uid, true);
 
         $this->assertSame($state, $response->getState());
         $this->assertSame($size, $response->getSize());
@@ -886,7 +865,7 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $this->client->userBalance((new UserBalanceParams($report_type_uid))->setDetailed(true));
+        $this->client->userBalance($report_type_uid, true);
     }
 
     /**
@@ -915,18 +894,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $params = new UserReportTypesParams;
-        $params
-            ->setCanGenerate(true)
-            ->setWithContent(true)
-            ->setQuery('_all')
-            ->setPerPage(20)
-            ->setOffset(0)
-            ->setPage(1)
-            ->setSortBy('-created_at')
-            ->setCalcTotal(true);
-
-        $response = $this->client->userReportTypes($params);
+        $response = $this->client->userReportTypes(true, true, '_all', 20, 0, 1, '-created_at', true);
 
         $this->assertCount(11, $response->getData());
         $this->assertSame(11, $response->getTotal());
@@ -1097,18 +1065,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $params = new UserReportsParams;
-        $params
-            ->setWithContent(true)
-            ->setQuery('_all')
-            ->setPerPage(20)
-            ->setOffset(0)
-            ->setPage(1)
-            ->setSortBy('-created_at')
-            ->setCalcTotal(true)
-            ->setDetailed(true);
-
-        $response = $this->client->userReports($params);
+        $response = $this->client->userReports(true, '_all', 20, 0, 1, '-created_at', true, true);
 
         $this->assertSame(8007997, $response->getTotal());
         $this->assertSame(2, $response->getSize());
@@ -1189,18 +1146,7 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $params = new UserReportsParams;
-        $params
-            ->setWithContent(true)
-            ->setQuery('_all')
-            ->setPerPage(20)
-            ->setOffset(0)
-            ->setPage(1)
-            ->setSortBy('-created_at')
-            ->setCalcTotal(true)
-            ->setDetailed(true);
-
-        $this->client->userReports($params);
+        $this->client->userReports(true, '_all', 20, 0, 1, '-created_at', true, true);
     }
 
     /**
@@ -1298,7 +1244,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->userReport(new UserReportParams($report_uid));
+        $response = $this->client->userReport($report_uid);
 
         $this->assertSame(1, $response->getSize());
         $this->assertEquals(
@@ -1376,7 +1322,7 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $this->client->userReport(new UserReportParams($report_uid));
+        $this->client->userReport($report_uid);
     }
 
     /**
@@ -1398,14 +1344,16 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $params = new UserReportMakeParams($report_type_uid, $type = 'VIN', $body = 'Z94CB41AAGR323020');
-        $params
-            ->setForce(true)
-            ->setOnUpdateUrl($on_update = $this->faker->url)
-            ->setOnCompleteUrl($on_complete = $this->faker->url)
-            ->setData($data = ['foo' => 'bar']);
-
-        $response = $this->client->userReportMake($params);
+        $response = $this->client->userReportMake(
+            'some_report_uid',
+            $type = 'VIN',
+            $body = 'Z94CB41AAGR323020',
+            null,
+            true,
+            $on_update = $this->faker->url,
+            $on_complete = $this->faker->url,
+            $data = ['foo' => 'bar']
+        );
 
         $this->assertSame(1, $response->getSize());
         $this->assertSame('ok', $response->getState());
@@ -1427,7 +1375,7 @@ class ClientTest extends AbstractTestCase
             DateTimeFactory::createFromIso8601Zulu('2019-07-07T19:23:58.897Z'), $made->getSuggestGet()
         );
 
-        $request_body = \json_decode($this->guzzle_handler->getLastRequest()->getBody()->getContents(), true);
+        $request_body = Json::decode($this->guzzle_handler->getLastRequest()->getBody()->getContents());
 
         $this->assertTrue($request_body['options']['FORCE']);
         $this->assertSame($type, $request_body['queryType']);
@@ -1462,47 +1410,12 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $params = new UserReportMakeParams($report_type_uid, $type = 'VIN', $body = 'Z94CB41AAGR323020');
-
-        $this->client->userReportMake($params);
-    }
-
-    /**
-     * @covers \Avtocod\B2BApi\Responses\UserReportMakeResponse
-     *
-     * @return void
-     */
-    public function testUserReportMakeWithIdempotenceKey(): void
-    {
-        $this->guzzle_handler->onUriRequested(
-            $this->settings->getBaseUri() . \sprintf(
-                'user/reports/%s/_make', \urlencode($report_type_uid = 'some_report_uid')
-            ),
-            'post',
-            new Response(
-                200,
-                ['content-type' => 'application/json;charset=utf-8'],
-                $raw = \file_get_contents(__DIR__ . '/../stubs/user__report__make.json')
-            )
+        $this->client->userReportMake(
+            'some_report_uid',
+            $type = 'VIN',
+            $body = 'Z94CB41AAGR323020',
+            null
         );
-
-        $params = new UserReportMakeParams($report_type_uid, $type = 'VIN', $body = 'Z94CB41AAGR323020');
-        $params
-            ->setIdempotenceKey($idempotence_key = $this->faker->word)
-            ->setForce($this->faker->boolean)
-            ->setOnUpdateUrl($this->faker->url)
-            ->setOnCompleteUrl($this->faker->url);
-
-        $response = $this->client->userReportMake($params);
-
-        // Common checks: Response is successful and we received a correct content
-        $this->assertSame(1, $response->getSize());
-        $this->assertSame('ok', $response->getState());
-        $this->assertJsonStringEqualsJsonString($raw, $response->getRawResponseContent());
-
-        // Check that we received correct 'idempotenceKey' in request body
-        $request_body = \json_decode($this->guzzle_handler->getLastRequest()->getBody()->getContents(), true);
-        $this->assertSame($idempotence_key, $request_body['idempotenceKey']);
     }
 
     /**
@@ -1525,7 +1438,7 @@ class ClientTest extends AbstractTestCase
             )
         );
 
-        $response = $this->client->userReportRefresh(new UserReportRefreshParams($report_uid));
+        $response = $this->client->userReportRefresh($report_uid);
 
         $this->assertSame(1, $response->getSize());
         $this->assertSame('ok', $response->getState());
@@ -1574,6 +1487,6 @@ class ClientTest extends AbstractTestCase
             new Response(200, ['content-type' => 'application/json;charset=utf-8'], '{"foo":]')
         );
 
-        $this->client->userReportRefresh(new UserReportRefreshParams($report_uid));
+        $this->client->userReportRefresh($report_uid);
     }
 }

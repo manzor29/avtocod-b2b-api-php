@@ -4,7 +4,7 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Responses\Entities;
 
-use DateTimeImmutable;
+use DateTime;
 use Avtocod\B2BApi\DateTimeFactory;
 
 class Report implements CanCreateSelfFromArrayInterface
@@ -50,12 +50,12 @@ class Report implements CanCreateSelfFromArrayInterface
     protected $domain_uid;
 
     /**
-     * @var array<string>
+     * @var array|string[]
      */
     protected $tags;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $created_at;
 
@@ -65,7 +65,7 @@ class Report implements CanCreateSelfFromArrayInterface
     protected $created_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $updated_at;
 
@@ -75,12 +75,12 @@ class Report implements CanCreateSelfFromArrayInterface
     protected $updated_by;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_from;
 
     /**
-     * @var DateTimeImmutable
+     * @var DateTime
      */
     protected $active_to;
 
@@ -125,13 +125,13 @@ class Report implements CanCreateSelfFromArrayInterface
      * @param string|null        $vehicle_id      Vehicle identifier
      * @param string             $report_type_uid Report type unique ID
      * @param string             $domain_uid      Domain unique ID
-     * @param array<string>      $tags            Tags list
-     * @param DateTimeImmutable  $created_at      Created at
+     * @param string[]           $tags            Tags list
+     * @param DateTime           $created_at      Created at
      * @param string             $created_by      Creator name
-     * @param DateTimeImmutable  $updated_at      Last changes was made at
+     * @param DateTime           $updated_at      Last changes was made at
      * @param string             $updated_by      Last changes was made by
-     * @param DateTimeImmutable  $active_from     Active from
-     * @param DateTimeImmutable  $active_to       Active to
+     * @param DateTime           $active_from     Active from
+     * @param DateTime           $active_to       Active to
      * @param int                $progress_ok     Successfully completed sources count
      * @param int                $progress_wait   Sources in a progress count
      * @param int                $progress_error  Errored sources count
@@ -148,12 +148,12 @@ class Report implements CanCreateSelfFromArrayInterface
                                 string $report_type_uid,
                                 string $domain_uid,
                                 array $tags,
-                                DateTimeImmutable $created_at,
+                                DateTime $created_at,
                                 string $created_by,
-                                DateTimeImmutable $updated_at,
+                                DateTime $updated_at,
                                 string $updated_by,
-                                DateTimeImmutable $active_from,
-                                DateTimeImmutable $active_to,
+                                DateTime $active_from,
+                                DateTime $active_to,
                                 int $progress_ok,
                                 int $progress_wait,
                                 int $progress_error,
@@ -185,11 +185,11 @@ class Report implements CanCreateSelfFromArrayInterface
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public static function fromArray(array $data): self
     {
-        return new self(
+        return new static(
             $data['uid'],
             $data['comment'],
             $data['name'],
@@ -201,12 +201,12 @@ class Report implements CanCreateSelfFromArrayInterface
             $data['report_type_uid'],
             $data['domain_uid'],
             \array_filter(\explode(',', $data['tags'])),
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['created_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['created_at']),
             $data['created_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['updated_at'])),
+            DateTimeFactory::createFromIso8601Zulu($data['updated_at']),
             $data['updated_by'],
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_from'])),
-            DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($data['active_to'])),
+            DateTimeFactory::createFromIso8601Zulu($data['active_from']),
+            DateTimeFactory::createFromIso8601Zulu($data['active_to']),
             $data['progress_ok'],
             $data['progress_wait'],
             $data['progress_error'],
@@ -299,7 +299,7 @@ class Report implements CanCreateSelfFromArrayInterface
     /**
      * Get tags list.
      *
-     * @return array<string>
+     * @return array|string[]
      */
     public function getTags()
     {
@@ -309,9 +309,9 @@ class Report implements CanCreateSelfFromArrayInterface
     /**
      * Get created at date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getCreatedAt(): DateTimeImmutable
+    public function getCreatedAt(): DateTime
     {
         return $this->created_at;
     }
@@ -329,9 +329,9 @@ class Report implements CanCreateSelfFromArrayInterface
     /**
      * Get last changes date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getUpdatedAt(): DateTimeImmutable
+    public function getUpdatedAt(): DateTime
     {
         return $this->updated_at;
     }
@@ -349,9 +349,9 @@ class Report implements CanCreateSelfFromArrayInterface
     /**
      * Get active from date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveFrom(): DateTimeImmutable
+    public function getActiveFrom(): DateTime
     {
         return $this->active_from;
     }
@@ -359,9 +359,9 @@ class Report implements CanCreateSelfFromArrayInterface
     /**
      * Get active to date/time.
      *
-     * @return DateTimeImmutable
+     * @return DateTime
      */
-    public function getActiveTo(): DateTimeImmutable
+    public function getActiveTo(): DateTime
     {
         return $this->active_to;
     }

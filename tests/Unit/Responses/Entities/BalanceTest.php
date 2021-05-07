@@ -4,7 +4,6 @@ declare(strict_types = 1);
 
 namespace Avtocod\B2BApi\Tests\Unit\Responses\Entities;
 
-use DateTimeImmutable;
 use Avtocod\B2BApi\DateTimeFactory;
 use Avtocod\B2BApi\Tests\AbstractTestCase;
 use Avtocod\B2BApi\Responses\Entities\Balance;
@@ -30,8 +29,8 @@ class BalanceTest extends AbstractTestCase
             $quote_init = $attributes['quote_init'],
             $quote_up = $attributes['quote_up'],
             $quote_use = $attributes['quote_use'],
-            $created_at = DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($attributes['created_at'])),
-            $updated_at = DateTimeImmutable::createFromMutable(DateTimeFactory::createFromIso8601Zulu($attributes['updated_at']))
+            $created_at = DateTimeFactory::createFromIso8601Zulu($attributes['created_at']),
+            $updated_at = DateTimeFactory::createFromIso8601Zulu($attributes['updated_at'])
         );
 
         $this->assertSame($report_type_uid, $balance->getReportTypeUid());
