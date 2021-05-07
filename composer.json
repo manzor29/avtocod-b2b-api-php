@@ -1,5 +1,5 @@
 {
-    "name": "avtocod/b2b-api-php",
+    "name": "manzor29/avtocod-b2b-api-php",
     "description": "PHP package for a working with B2B API service",
     "keywords": [
         "avtocod",
@@ -10,8 +10,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "Avtocod",
-            "homepage": "https://github.com/avtocod"
+            "name": "manzor29",
+            "homepage": "https://bitbucket.org/manzor29/"
         }
     ],
     "require": {
@@ -59,8 +59,7 @@
         ]
     },
     "support": {
-        "issues": "https://github.com/avtocod/b2b-api-php/issues",
-        "source": "https://github.com/avtocod/b2b-api-php"
+        "source": "https://bitbucket.org/manzor29/avtocod-b2b-api-php"
     },
     "config": {
         "sort-packages": true
